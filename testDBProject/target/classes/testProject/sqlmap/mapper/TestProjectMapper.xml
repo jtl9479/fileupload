@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="testProjectMapper">
+ 
+    <select id="selectTable" parameterType="map" resultType="map">
+		SELECT FILE_NO
+		     , FILE_NAME
+		     , FILE_URL
+		  FROM TB_FILE_UP 
+    </select>
+    
+    <insert id="insertTable" parameterType="map">
+    INSERT INTO TB_FILE_UP
+				 (FILE_NO, 
+				  FILE_NAME,
+				  FILE_URL
+				  )
+				  VALUES 
+				  (
+				  #{fileNo},
+				  #{fileName},
+				  #{fileUrl}
+				  );
+				    
+    
+    </insert>
+</mapper>

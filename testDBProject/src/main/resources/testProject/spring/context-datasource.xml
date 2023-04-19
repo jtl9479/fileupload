@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+	xmlns:context="http://www.springframework.org/schema/context"
+
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+
+	<!-- 1. DB Connection을 위한 객체 생성 -->
+	<bean id="dataSourceOracle" 
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<!--oracle jdbc 연결  -->
+		<!--
+		 <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521/xe"/>
+		 -->
+				
+		<!--log4jdbc 연결 -->
+		<!-- 
+		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy"/>
+		<property name="url" value="jdbc:log4jdbc:oracle:thin:@localhost:1521/xe"/>
+		 -->
+		
+		<!--1. log4jdbc-remix  -->
+		 <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+		<property name="url" value="jdbc:oracle:thin:@localhost:1521/xe"/>
+		<property name="username" value="SQLD"/>
+		<property name="password" value="1234"/>
+	</bean>	
+		
+	<!--2.log4jdbc-remix  -->
+	<bean id="dataSource"	class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		<constructor-arg ref="dataSourceOracle" />
+		<property name="logFormatter">
+			<bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<!-- <property name="margin" value="8" /> -->
+				<property name="sqlPrefix" value="SQL:" />
+			</bean>
+		</property>
+	</bean>
+	
+	<!-- 2. Mybatis DB 프로그램에서 사용할 객체 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!--오라클 설정  -->
+		<!-- <property name="dataSource" ref="dataSource" /> -->
+		
+		<!--3.log4j-remix  -->
+		<property name="dataSource" ref="dataSource" />
+		
+		<!-- classpath: -> src/main/resources 위치를 찾는다. -->
+		<property name="configLocation" value="classpath:testProject/sqlmap/config/sql-map-config.xml"/>	
+		<!-- DB에서 실행할 sql 문장을 태그로 정의해 놓는다. -->
+		<property name="mapperLocations" value="classpath:testProject/sqlmap/mapper/*.xml"/>
+	</bean>
+
+	<!-- 3. Mybatis DB 프로그램의 자동화 객체 -> template -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/>
+	</bean>
+
+	
+
+</beans>
